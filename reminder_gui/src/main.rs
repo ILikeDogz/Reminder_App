@@ -96,26 +96,7 @@ impl ReminderGui {
             }
         }
     }
-    fn render_reminder_text_fields(&mut self, ui: &mut eframe::egui::Ui) {
-        //summons editable text fields for reminder
-        ui.horizontal(|ui| {
-            //holds in horizontal
-            //labeling that is probably useful
-            let title_label = ui.label("Title:  \t\t\t");
-            ui.text_edit_singleline(&mut self.reminder.title)
-                .labelled_by(title_label.id);
-        });
-        ui.horizontal(|ui| {
-            let description_label = ui.label("Description: ");
-            ui.add(egui::TextEdit::multiline(&mut self.reminder.description))
-                .labelled_by(description_label.id);
-        });
-        //in order to set the relative time for the date picker, I had to go into the crate to popup.rs and change the time variable
-        ui.horizontal(|ui| {
-            ui.label("Date:\t\t\t\t");
-            //calls in the date picker button
-            ui.add(egui_extras::DatePickerButton::new(&mut self.reminder.date));
-        });
+    fn render_time_controls(&mut self, ui: &mut eframe::egui::Ui){
         ui.horizontal(|ui|{
             ui.label("Hour:");
             //creates selectable boxes for hour and minute
@@ -147,6 +128,28 @@ impl ReminderGui {
             });
         });
     }
+    fn render_reminder_text_fields(&mut self, ui: &mut eframe::egui::Ui) {
+        //summons editable text fields for reminder
+        ui.horizontal(|ui| {
+            //holds in horizontal
+            //labeling that is probably useful
+            let title_label = ui.label("Title:  \t\t\t");
+            ui.text_edit_singleline(&mut self.reminder.title)
+                .labelled_by(title_label.id);
+        });
+        ui.horizontal(|ui| {
+            let description_label = ui.label("Description: ");
+            ui.add(egui::TextEdit::multiline(&mut self.reminder.description))
+                .labelled_by(description_label.id);
+        });
+        //in order to set the relative time for the date picker, I had to go into the crate to popup.rs and change the time variable
+        ui.horizontal(|ui| {
+            ui.label("Date:\t\t\t\t");
+            //calls in the date picker button
+            ui.add(egui_extras::DatePickerButton::new(&mut self.reminder.date));
+        });
+        self.render_time_controls(ui);
+    }
     fn render_reminder_window(&mut self, ctx: &egui::Context) {
         let mut window_status = true;
         Window::new("Reminder")
@@ -158,9 +161,11 @@ impl ReminderGui {
                 //magical date picker
                 if !self.reminder.is_not_filled() && ui.button("save reminder").clicked() {
                     //saves time to reminder
-                    self.parse_hours_minutes_to_naive_time();
+                    self.reminder.time = self.parse_hours_minutes_to_naive_time();
                     self.reset_hours_minutes();
-                    self.reminder_list.save_reminder(&mut self.reminder);
+                    self.reminder_list.save_reminder(&self.reminder);
+                    //clears actively held reminder
+                    self.reminder = Reminder::new();
                     self.reminder_list.save_list_to_json(false);
                     self.reminder_window_status = false;
                     // add something to show confirmation that it was saved
@@ -194,8 +199,8 @@ impl ReminderGui {
         //space so nothing goes into the top panel
         ui.add_space(40.0);
     }
-    fn parse_hours_minutes_to_naive_time(&mut self){
-        self.reminder.time = NaiveTime::from_hms_opt(self.hours, self.minutes, 0).expect("failed to parse hours and minutes to time");
+    fn parse_hours_minutes_to_naive_time(&mut self) -> NaiveTime{
+        NaiveTime::from_hms_opt(self.hours, self.minutes, 0).expect("failed to parse hours and minutes to time")
     }
     fn reset_hours_minutes(&mut self){
         self.hours = 0;
