@@ -1,0 +1,13 @@
+[package]
+name = "reminder_gui"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = {version = "0.4.30"}
+eframe = {version = "0.22.0", features = ["serde"]}
+egui = {version = "0.22.0"}
+egui_extras = {version = "0.22.0", features = ["chrono"]}
+reminder_api = {path = "../reminder_api"}

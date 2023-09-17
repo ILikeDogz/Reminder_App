@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "reminder_api",
+    "reminder_gui",
+]
