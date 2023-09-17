@@ -104,11 +104,10 @@ impl ReminderList {
         //provides read access to the list, without making field public
         &self.list
     }
-    pub fn save_reminder(&mut self, reminder: &mut Reminder) {
+    pub fn save_reminder(&mut self, reminder: &Reminder) {
         //creates a new reminder by copying
         let new_reminder = reminder.clone();
-        //clears the active reminder
-        *reminder = Reminder::new();
+        
         self.list.push(new_reminder);
     }
     pub fn delete_reminder(&mut self, reminder: &Reminder){
@@ -151,3 +150,4 @@ impl ReminderList {
         self.save_list_to_json(true);
     }
 }
+
